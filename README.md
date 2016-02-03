@@ -15,7 +15,7 @@ This workshop assumes you have a general understanding of the basics concepts in
  * [W3 Schools: CSS](http://www.w3schools.com/css/default.asp)
  * [W3 Schools: JS](http://www.w3schools.com/js/default.asp)
  * [W3 Schools: Bootstrap](http://www.w3schools.com/bootstrap/default.asp)
- * 
+ 
 ###### Code Examples
  * [W3 Schools: HTML Snippets](http://www.w3schools.com/html/html_examples.asp)
  * [W3 Schools: CSS Snippets](http://www.w3schools.com/css/css_examples.asp)
