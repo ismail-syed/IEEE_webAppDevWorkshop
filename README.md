@@ -2,7 +2,7 @@
 
 An IEEE workshop to introduce students to full stack web application development using Meteor.js
 
-#### Prerequisites: HTML, CSS, JavaScript
+### Prerequisites: HTML, CSS, JavaScript
 This workshop assumes you have a general undestading of the basics of HTML, CSS, JavaScript, Bootstrap. Below, I've listed some excellent resources which you can use to either brush up or thoughly learn these concepts. 
 
 ###### Comprehensive & Interactive Learning
@@ -23,3 +23,9 @@ This workshop assumes you have a general undestading of the basics of HTML, CSS,
  * [W3 Schools: HTML Reference](http://www.w3schools.com/tags/default.asp)
  * [W3 Schools: CSS Reference](http://www.w3schools.com/cssref/default.asp)
  * [W3 Schools: JS Reference](http://www.w3schools.com/jsref/default.asp)
+
+
+
+### Worshop Overview
+- In this workshop we will be building a Twitter clone using Meteor JS, a full stack realtime web application framework. 
+- We will be following an excellent tutorial  written by [Kai from randomdotnext.com](http://randomdotnext.com/) - [Meteor Tutorial - Let's build a Twitter clone](http://randomdotnext.com/meteor-tutorial-p1/) 
