@@ -44,7 +44,7 @@ This workshop assumes you have a general understanding of the basics concepts in
 #### Section 1: Installation & Setup
 - [Install Meteor](https://www.meteor.com/install)
 
-Meteor comes with a command-line tool belt `meteor` 
+Meteor comes with a command-line tool belt `meteor` used to create your project and run many of meteors commands. 
 
 
 
