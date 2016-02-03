@@ -7,6 +7,7 @@ This workshop assumes you have a general undestading of the basics of HTML, CSS,
 
 ###### Comprehensive & Interactive Learning
 [HTML & CSS Codecademy (~7 hours)](https://www.codecademy.com/learn/javascript)
+
 [JavaScript (~10 hours)](https://www.codecademy.com/learn/javascript)
 
 ###### Quick Reads & Tutorials 
