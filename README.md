@@ -12,7 +12,7 @@ This workshop assumes you have a general undestading of the basics of HTML, CSS,
 
 ###### Quick Reads & Tutorials 
 
-*[W3 Schools: HTML](http://www.w3schools.com/html/default.asp)
+* [W3 Schools: HTML](http://www.w3schools.com/html/default.asp)
   -[W3 Schools: CSS](http://www.w3schools.com/css/default.asp)
   -[W3 Schools: JS](http://www.w3schools.com/js/default.asp)
 
