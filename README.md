@@ -33,8 +33,8 @@ This workshop assumes you have a general understanding of the basics concepts in
 
 
 ## Part 1: Intro to Meteor
- 
- #### What is Meteor & Why it's awesome
+
+#### What is Meteor
 - Meteor is a full-stack JavaScript framework. What is a full-stack framework?
 - Meteor is real time out the box. What the heck does that mean?
 - Meteor is built on top of node.js. What is node.js? Do I need to learn it?
