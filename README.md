@@ -34,13 +34,13 @@ This workshop assumes you have a general understanding of the basics concepts in
 
 ## Part 1: Intro to Meteor
 
-#### What is Meteor
+### What is Meteor
 - Meteor is a full-stack JavaScript framework. What is a full-stack framework?
 - Meteor is real time out the box. What the heck does that mean?
 - Meteor is built on top of node.js. What is node.js? Do I need to learn it?
 - The core of Meteor comes with MongoDB (Database), Blaze (front-end reactive framework)
 
-#### Section 1: Installation & Setup
+### Section 1: Installation & Setup
 - [Install Meteor](https://www.meteor.com/install)
 
 Meteor comes with a command-line tool belt `meteor` used to create your project and run many of meteors commands. 
@@ -54,6 +54,8 @@ $ meteor
 
 Open browser to localhost:3000 to see your application running.
 
+### Section 1: Exploring the barebone Meteor app
+
 Open your project folder in a file explorer. You should see the following files/folders:
 - myTwitterClone.css
 - myTwitterClone.html
@@ -61,12 +63,39 @@ Open your project folder in a file explorer. You should see the following files/
 - .meteor (hidden folder)
 
 __Notes__:
-- Entire js application is in 1 file with serverside and client side blocks
+- Entire js logic of the application is in 1 file with serverside and client side blocks
 - The server side and client side will eventually be broken up into seperate modules
+
 
 *Server vs Client example*:
 - When you log into Facebook, your browser doesn't get every single Facebook photo every uploaded. 
 - The server will just send back what is revelant based on what the client logic requests
 
+#### Events block
+Within your myTwitterClone.js file:
+```javascript
+  Template.hello.events({
+    'click button': function () {
+      // increment the counter when button is clicked
+      Session.set('counter', Session.get('counter') + 1);
+    }
+  });
+```
+- Similar to jQuery style of listening to events
+- *Changes to variables stored inside the Session variable reactively notify all the listeners on that variable*
+
+#### Helpers block
+Within your myTwitterClone.js file:
+```javascript
+Template.hello.helpers({  
+  counter: function () {
+    return Session.get('counter');
+  }
+});
+```
+- This helper function listens to any changes happending to the Session variable `counter`
+- If the value of the `counter' changes, the helper tell the front-end that the HTML should render a new value
+
+#### What is a Template?
 
 
