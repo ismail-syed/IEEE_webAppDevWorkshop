@@ -27,7 +27,7 @@ This workshop assumes you have a general understanding of the basics concepts in
  * [W3 Schools: JS Reference](http://www.w3schools.com/jsref/default.asp)
 
 
-### Worshop Overview
+### Workshop Overview
 - In this workshop we will be building a Twitter clone using [Meteor](https://www.meteor.com/), a full-stack web application framework. 
 - We will be following an excellent tutorial  written by [Kai from randomdotnext.com](http://randomdotnext.com/) - [Meteor Tutorial - Let's build a Twitter clone](http://randomdotnext.com/meteor-tutorial-p1/)
 
@@ -52,4 +52,21 @@ $ cd myTwitterClone
 $ meteor
 ```
 
-Open browser to localhost:3000
+Open browser to localhost:3000 to see your application running.
+
+Open your project folder in a file explorer. You should see the following files/folders:
+- myTwitterClone.css
+- myTwitterClone.html
+- myTwitterClone.js
+- .meteor (hidden folder)
+
+__Notes__:
+- Entire js application is in 1 file with serverside and client side blocks
+- The server side and client side will eventually be broken up into seperate modules
+
+*Server vs Client example*:
+- When you log into Facebook, your browser doesn't get every single Facebook photo every uploaded. 
+- The server will just send back what is revelant based on what the client logic requests
+
+
+
