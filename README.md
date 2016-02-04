@@ -45,8 +45,11 @@ This workshop assumes you have a general understanding of the basics concepts in
 
 Meteor comes with a command-line tool belt `meteor` used to create your project and run many of meteors commands. 
 
+Create a Meteor project:
+```bash
+$ meteor create myTwitterClone
+$ cd myTwitterClone
+$ meteor
+```
 
-
-
-
-
+Open browser to localhost:3000
