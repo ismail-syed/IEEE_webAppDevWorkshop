@@ -202,3 +202,25 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
   </div>
 </template>  
 ```
+
+##### What is all this gibberish?
+1. The textbox:
+`<textarea class="form-control" id="tweetText" placeholder="What's happening?" rows="3"></textarea>`
+- This is simply a textbox for users to input the tweet content
+
+
+2. The character countdown:
+`<strong class="{{charClass}}">{{charCount}}</strong>`
+- We need to implment two function in the javascript helper blocks to handle `{{charClass}}` and `{{charCount}}`
+- `{{charClass}}` should return the correct css class to be used. If # of characters is greater than max (140), then the text should be red. Blaze allows you to inject this HTML paramter from the Javascript!
+- `{{charCount}}` should return an integer representing the # of characters remaining. This logic will be in javascript as well
+
+3. The tweet button:
+`<button class="btn btn-info pull-right" type="button" {{disableButton}}>Tweet</button>`
+- If were over 140 characters, disable the button
+- We'll implement disableButton function in the javascript helpers. 
+- It should return a string, either be 'disabled' or empty.
+
+##### Take-away
+- Dynamically insert html elements, tags, classes, components, etc by using Meteor's blaze framework
+- Easily modify what the UI render will look like without worrying about complicated front-end logic
