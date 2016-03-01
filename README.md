@@ -97,5 +97,26 @@ Template.hello.helpers({
 - If the value of the `counter` changes, the helper tell the front-end that the HTML should render a new value
 
 #### What is a Template?
+- Where your actual UI lives 
+- Primary composed of HTML which can be paired up with a front end templating engine
+- Meteor uses [Blaze](https://www.meteor.com/blaze) for this
 
+##### The HTML
+```html
+<head>  
+  <title>twitterClone</title>
+</head>
+
+<body>  
+  <h1>Welcome to Meteor!</h1>
+
+  {{> hello}}
+</body>
+
+<template name="hello">  
+  <button>Click Me</button>
+  <p>You've pressed the button {{counter}} times.</p>
+</template> 
+});
+```
 
