@@ -141,7 +141,7 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
 2. The Button should be disabled if there is no text
 3. Save the data to mongodb when you click Tweet
 
-#### Section 1: Adding Bootstrap to our Meteor project
+### Section 1: Adding Bootstrap to our Meteor project
 - `meteor add twbs:bootstrap` and were done!
 - Meteor offers LOTS of 3rd packages/libraries through [AtmosphereJS](https://atmospherejs.com/)
 - `meteor add package-name` is the syntax for addding these packages
@@ -290,3 +290,19 @@ Tweets = new Meteor.Collection("tweets");
 - Now you can to try to tweet in the barebone tweetBox. This is the UI that you should see if you followed along:
 ![Tweetbox](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-11-at-10-47-06-AM.png)
 
+- We are not showing any tweets in the UI yet, so we need to use the mongodb console tool to see that the data is getting stored correctly.
+- Meteor makes this process easy. In your project directory, you can type in
+```bash
+meteor mongo
+```
+- Mongo console should now show up in your terminal/cmd. 
+- type in `db.tweets.find()`
+```bash
+meteor:PRIMARY> db.tweets.find()  
+{ "_id" : "BbQczRMQp5FGQ39qa", "message" : "meteor is cool" }
+```
+
+- This is actually Amazing!
+- We are inserting into the database directly in the client code.
+- No need to be proxying db operations through a REST point
+- This is the power of Meteor
