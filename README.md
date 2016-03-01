@@ -41,7 +41,7 @@ This workshop assumes you have a general understanding of the basics concepts in
 - The core of Meteor comes with MongoDB (Database), Blaze (front-end reactive framework)
 - It's a 'hot' framwork [http://hotframeworks.com/](http://hotframeworks.com/)
 
-### Section 1: Installation & Setup
+### Section 1.1: Installation & Setup
 - [Install Meteor](https://www.meteor.com/install)
 
 Meteor comes with a command-line tool belt `meteor` used to create your project and run many of meteors commands. 
@@ -55,7 +55,7 @@ $ meteor
 
 Open browser to localhost:3000 to see your application running.
 
-### Section 1: Exploring the barebone Meteor app
+### Section 1.2: Exploring the barebone Meteor app
 
 Open your project folder in a file explorer. You should see the following files/folders:
 - myTwitterClone.css
@@ -141,7 +141,7 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
 2. The Button should be disabled if there is no text
 3. Save the data to mongodb when you click Tweet
 
-### Section 1: Adding Bootstrap to our Meteor project
+### Section 2.1: Adding Bootstrap to our Meteor project
 - `meteor add twbs:bootstrap` and were done!
 - Meteor offers LOTS of 3rd packages/libraries through [AtmosphereJS](https://atmospherejs.com/)
 - `meteor add package-name` is the syntax for addding these packages
@@ -226,7 +226,7 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
 - Easily modify what the UI render will look like without worrying about complicated front-end logic
 
 
-### Section 3: Counter and Tweet Button Javascript
+### Section 2.3: Counter and Tweet Button Javascript
 - Keeping a counter of character count in the tweetbox
 - Meteor templates offer three lifecycle callback functions: `onCreated`, `onDestroyed`, and `onRendered`
 - We can set the initial character counter to zero when the tweetBox template is rendered
@@ -272,7 +272,7 @@ Template.tweetBox.helpers({
 - Notice that the changes to numChars actually reactively notify these helper methods to push new values into the DOM
 - However, if the helper method only has static values, it will not run when you update Session variables
 
-### Section 4: Add Tweets to MongoDB:
+### Section 2.4: Add Tweets to MongoDB:
 - We need to add one more event listener inside of Template.tweetBox.events to insert data into mongoDB
 ```javascript
 'click button': function() {  
@@ -312,7 +312,7 @@ meteor:PRIMARY> db.tweets.find()
 
 ![User Authentication](http://randomdotnext.com/content/images/2015/07/loginExp.gif)
 
-### Section 1: Meteor User Accounts Package
+### Section 3.1: Meteor User Accounts Package
 - Meteor makes the process of user management very easy. Let's go ahead and add the meteor packages:
 ```bash
 meteor add accounts-ui accounts-password  
@@ -335,7 +335,7 @@ meteor:PRIMARY> db.users.find()
 { "_id" : "iw75fJLwPNXwDrPWN", "createdAt" : ISODate("2015-07-11T20:49:30.702Z"), "services" : { "password" : { "bcrypt" : "$2a$10$2Od1oJZm693aRzIyYNIVVO4XyAuU0pXrcsrHgvuu0p0MWbp1aSzGW" }, "resume" : { "loginTokens" : [ ] } }, "emails" : [ { "address" : "test@test.com", "verified" : false } ] }
 ```
 
-### Section 2: Customize Login UI (Signup)
+### Section 3.2: Customize Login UI (Signup)
 - Let's customize the user experience so it conforms to a twitter-like experience
 - Let's create a user management template:
 
@@ -384,7 +384,7 @@ Template.userManagement.events({
 - It comes with a variety of customization and methods [(documentation)](http://docs.meteor.com/#/full/meteor_user)
 - You can also add third-party authentication through services like twitter, facebook, google, etc. by adding their accounts packages.
 
-### Section 3: Customize Login UI (Login)
+### Section 3.3: Customize Login UI (Login)
 Login module can be created similarly
 
 #### twitterClone.html
@@ -422,7 +422,7 @@ Template.userManagement.events({
 - Bring out your browser console and type in `Meteor.user()` to see the logged in user
 - If your not logged in, this will return null
 
-### Section 4: Customize Login UI 
+### Section 3.4: Customize Login UI 
 - User should know when they're logged in and they can logout
 - Let's put all the pieces we have built together to complete the user management lifecycle
 
@@ -482,7 +482,7 @@ Template.userManagement.events({
 
 Our user management module is now complete!
 
-### Section 4: Logging out
+### Section 3.4: Logging out
 Logging a user out is as easy as logging a user in.
 
 #### twitterClone.html
@@ -496,7 +496,7 @@ Logging a user out is as easy as logging a user in.
 }
 ```
 
-### Section 5: Assign Tweets to Users
+### Section 3.5: Assign Tweets to Users
 Now that we have user information. We can assign the currentUser username to each tweet
 
 #### twitterClone.js
