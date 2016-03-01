@@ -238,7 +238,6 @@ Template.tweetBox.onRendered(function () {
 ```
 - We want to update the character counter when the user types content into the textbox
 - We can add an event listener for input into #tweetText element. This syntax is quite similar to that of jQuery. tweetText is the id of the DOM element.
-- 
 ```javascript
 Template.tweetBox.events({  
   'input #tweetText': function(){
