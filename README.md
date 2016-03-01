@@ -39,6 +39,7 @@ This workshop assumes you have a general understanding of the basics concepts in
 - Meteor is real time out the box. What the heck does that mean?
 - Meteor is built on top of node.js. What is node.js? Do I need to learn it?
 - The core of Meteor comes with MongoDB (Database), Blaze (front-end reactive framework)
+- It's a 'hot' framwork [http://hotframeworks.com/](http://hotframeworks.com/)
 
 ### Section 1: Installation & Setup
 - [Install Meteor](https://www.meteor.com/install)
@@ -116,7 +117,13 @@ Template.hello.helpers({
 <template name="hello">  
   <button>Click Me</button>
   <p>You've pressed the button {{counter}} times.</p>
-</template> 
-});
+</template>
 ```
+The head & body html syntax should be familiar to you all. Let's cover the blaze components now. 
+
+##### Template - hello
+- `{{> hello}}` is a blaze/handlebar syntax for adding in a template
+- The hello template is defined in the HTML block `<template name="hello">`
+- Using 'variables' like `{{counter}}` in your HTML template is another Blaze feature
+- `{{counter}}` renders the output of you counter method defined in the Javascipt helper block `counter: function()`
 
