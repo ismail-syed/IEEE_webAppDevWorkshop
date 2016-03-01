@@ -312,3 +312,240 @@ meteor:PRIMARY> db.tweets.find()
 
 ![User Authentication](http://randomdotnext.com/content/images/2015/07/loginExp.gif)
 
+### Section 1: Meteor User Accounts Package
+- Meteor makes the process of user management very easy. Let's go ahead and add the meteor packages:
+```bash
+meteor add accounts-ui accounts-password  
+```
+- The meteor packages comes with HTML template, you can go ahead and drop this in html:
+```bash
+{{> loginButtons}}
+```
+
+You will see a super basic signup/login UI:
+
+![User Authentication](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-11-at-1-51-50-PM-1.png)
+
+- Meteor gives you user account management, complete with bcrypt, user db operations, session management, auth logic right out of the box
+- We basically did a million things in one line...
+
+If you try to create a user now, you can see in the mongodb console:
+``` bash
+meteor:PRIMARY> db.users.find()  
+{ "_id" : "iw75fJLwPNXwDrPWN", "createdAt" : ISODate("2015-07-11T20:49:30.702Z"), "services" : { "password" : { "bcrypt" : "$2a$10$2Od1oJZm693aRzIyYNIVVO4XyAuU0pXrcsrHgvuu0p0MWbp1aSzGW" }, "resume" : { "loginTokens" : [ ] } }, "emails" : [ { "address" : "test@test.com", "verified" : false } ] }
+```
+
+### Section 2: Customize Login UI (Signup)
+- Let's customize the user experience so it conforms to a twitter-like experience
+- Let's create a user management template:
+
+#### twitterClone.css
+[CSS on GitHub](https://github.com/ruler88/twitterClone/blob/master/part3_userAuth/twitterClone.css)
+
+#### twitterClone.html
+```html
+<template name="userManagement">
+
+  <h4>New User?</h4>
+  <div class="form-group">
+    <input class="form-control input-sm" id="signup-username" placeholder="Username">
+    <input class="form-control input-sm" id="signup-fullname" placeholder="Full Name (Optional)">
+    <input class="form-control input-sm" id="signup-password" placeholder="Password" type="password">
+  </div>
+
+  <button type="button" class="btn btn-info fullbutton" id="signup">Sign up</button>
+
+</template>  
+```
+
+#### twitterClone.js
+```javascript
+Template.userManagement.events({  
+  'click #signup': function() {
+    var user = {
+      username: $('#signup-username').val(),
+      password: $('#signup-password').val(),
+      profile: {
+        fullname: $('#signup-fullname').val()
+      }
+    };
+
+    Accounts.createUser(user, function (error) {
+      if(error) alert(error);
+    });
+  }
+});
+```
+- We are creating a new template `userManagement`
+- The javascript code is listening to clicks on `signup` button
+- A new user variable is created and processed through `Accounts.createUser`
+
+- `Accounts.createUser()` method is made available through the accounts-ui package
+- It comes with a variety of customization and methods [(documentation)](http://docs.meteor.com/#/full/meteor_user)
+- You can also add third-party authentication through services like twitter, facebook, google, etc. by adding their accounts packages.
+
+### Section 3: Customize Login UI (Login)
+Login module can be created similarly
+
+#### twitterClone.html
+```html
+<template name="userManagement">  
+  ...
+
+  <h4>Already have an account?</h4>
+  <div class="form-group">
+    <input class="form-control input-sm" id="login-username" placeholder="Username">
+    <input class="form-control input-sm" id="login-password" placeholder="Password" type="password">
+  </div>
+
+  <button type="button" class="btn btn-info fullbutton login" id="login">Log in</button>
+
+</template>  
+```
+
+#### twitterClone.js
+```javascript
+Template.userManagement.events({  
+  'click #login': function() {
+    var username = $('#login-username').val();
+    var password = $('#login-password').val();
+
+    Meteor.loginWithPassword(username, password, function(error) {
+      if(error) alert(error);
+    });
+  }
+});
+```
+- `Meteor.loginWithPassword()` will try to log the user in via the username and password provided. 
+- If the validation is correct, browser cookie will be set for you. If validation fails, the callback function will have error.
+
+- Bring out your browser console and type in `Meteor.user()` to see the logged in user
+- If your not logged in, this will return null
+
+### Section 4: Customize Login UI 
+- User should know when they're logged in and they can logout
+- Let's put all the pieces we have built together to complete the user management lifecycle
+
+#### twitterClone.html
+```html
+<body>  
+  <div class="row">
+    <div class="col-md-4 col-sm-4">{{> userManagement}}</div>
+    <div class="col-md-8 col-sm-8">{{> tweetBox}}</div>
+  </div>
+</body>
+
+<template name="userManagement">  
+  <div class="user-container">
+    <div class="panel panel-default userBox">
+      <div class="panel-body">
+        {{# if currentUser}}
+        <!-- Message for logged in user -->
+        <p>Hello <strong>@{{currentUser.username}}</strong>, welcome to twitterClone</p>
+
+        {{else}}
+        <!-- Log in module -->
+        <h4>Already have an account?</h4>
+        <div class="form-group">
+          <input class="form-control input-sm" id="login-username" placeholder="Username">
+          <input class="form-control input-sm" id="login-password" placeholder="Password" type="password">
+        </div>
+
+        <button type="button" class="btn btn-info fullbutton login" id="login">Log in</button>
+
+
+        <!-- Sign up module -->
+        <h4>New User?</h4>
+        <div class="form-group">
+          <input class="form-control input-sm" id="signup-username" placeholder="Username">
+          <input class="form-control input-sm" id="signup-fullname" placeholder="Full Name (Optional)">
+          <input class="form-control input-sm" id="signup-password" placeholder="Password" type="password">
+        </div>
+
+        <button type="button" class="btn btn-info fullbutton" id="signup">Sign up</button>
+        {{/if}}
+
+      </div>
+    </div>
+  </div>
+</template>  
+```
+- We have put in some Blaze template code to show logged in user 
+- `{{# if currentUser}}` `{{else}}` `{{/if}}` block will show a welcome message if user is logged in, or the login/signup form if the user is not logged in
+- `currentUser` is calling a helper method that is part of Meteor user-accounts package [(doc)(http://docs.meteor.com/#/full/template_currentuser)
+
+```html
+<p>Hello <strong>@{{currentUser.username}}</strong>, welcome to twitterClone</p>  
+```
+- access the user's username through {{currentUser.username}} 
+- currentUser returns the entire user object to the browser
+
+Our user management module is now complete!
+
+### Section 4: Logging out
+Logging a user out is as easy as logging a user in.
+
+#### twitterClone.html
+```html
+<button type="button" class="btn btn-info fullbutton" id="logout">Log out</button>  
+```
+#### twitterClone.js
+```javascript
+'click #logout': function() {  
+  Meteor.logout();
+}
+```
+
+### Section 5: Assign Tweets to Users
+Now that we have user information. We can assign the currentUser username to each tweet
+
+#### twitterClone.js
+```javascript
+Template.tweetBox.events({  
+  'click button': function() {
+    ...
+    Tweets.insert({message: tweet, user: Meteor.user().username});
+  }
+});
+```
+- Meteor.user() is an accessibility method for developers to get current logged in user's information
+ 
+We should also make sure only logged in users can post stuff 
+```javascript
+if (Meteor.user()) {  
+  Tweets.insert({message: tweet, user: Meteor.user().username});
+}
+```
+
+Additionally, let's prevent users from even clicking tweet if they aren't logged in:
+```javascript
+Template.tweetBox.helpers({
+
+  disableButton: function() {
+    if (Session.get('numChars') <= 0 ||
+        Session.get('numChars') > 140 ||
+        !Meteor.user()) {
+      return 'disabled';
+    }
+  }
+
+});
+```
+We will change the button message to make sure users understand why the post button is disabled in the UI
+
+#### twitterClone.html
+```html
+{{#if currentUser}}
+  <button class="btn btn-info pull-right" type="button" {{disableButton}}>Tweet</button>
+{{else}}
+  <button class="btn btn-info pull-right" type="button" disabled>Please Log In</button>
+{{/if}}
+```
+
+Let's add a tweet and check out our database again!
+```bash
+meteor:PRIMARY> db.tweets.find()  
+{ "_id" : "myxrQmPWbKDrKDcr9", "message" : "hello world", "user" : "l33thax" }
+```
+
+
