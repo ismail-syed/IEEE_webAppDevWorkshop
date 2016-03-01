@@ -306,3 +306,8 @@ meteor:PRIMARY> db.tweets.find()
 - We are inserting into the database directly in the client code.
 - No need to be proxying db operations through a REST point
 - This is the power of Meteor
+
+## Part 3: User Accounts
+- In this part we will be building a user authentication system
+![User Authentication](http://randomdotnext.com/content/images/2015/07/loginExp.gif)
+
