@@ -128,8 +128,77 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
 - `{{counter}}` renders the output of you counter method defined in the Javascipt helper block `counter: function()`
 
 
+
+
 ## Part 2: Client Template JS
 
 - In this part, we will be learning about client side template of Meteor
 - The goal is to build a tweetbox
 ![Tweetbox](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-11-at-10-47-06-AM.png)
+
+##### Key features to implement
+1. Change the character count as you type
+2. The Button should be disabled if there is no text
+3. Save the data to mongodb when you click Tweet
+
+#### Section 1: Adding Bootstrap to our Meteor project
+- `meteor add twbs:bootstrap` and were done!
+- Meteor offers LOTS of 3rd packages/libraries through [AtmosphereJS](https://atmospherejs.com/)
+- `meteor add package-name` is the syntax for addding these packages
+- If your getting errors try `sudo meteor add twbs:bootstrap`
+
+##### twitterClone.css
+```css
+.tweetbox-container {
+  margin: 45px;
+}
+
+.tweetbox {
+  background-color: rgb(240, 247, 254);
+}
+
+.btnGroup {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+}
+
+.charCount {
+  margin-right: 10px;
+  color: gray;
+}
+
+.errCharCount {
+  margin-right: 10px;
+  color: red;
+}
+```
+
+##### twitterClone.html
+```html
+<head>  
+  <title>twitterClone</title>
+</head>
+
+<body>  
+  {{> tweetBox}}
+</body>
+
+<template name="tweetBox">  
+  <div class="tweetbox-container">
+    <div class="panel panel-default tweetbox col-md-6">
+      <div class="panel-body">
+        <!-- Text box for tweet content -->
+        <textarea class="form-control" id="tweetText" placeholder="What's happening?" rows="3"></textarea>
+
+        <!-- Character count & button -->
+        <div class="pull-right btnGroup">
+          <strong class="{{charClass}}">{{charCount}}</strong>
+          <button class="btn btn-info pull-right" type="button" {{disableButton}}>Tweet</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</template>  
+```
