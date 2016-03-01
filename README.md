@@ -127,3 +127,9 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
 - Using 'variables' like `{{counter}}` in your HTML template is another Blaze feature
 - `{{counter}}` renders the output of you counter method defined in the Javascipt helper block `counter: function()`
 
+
+## Part 2: Client Template JS
+
+- In this part, we will be learning about client side template of Meteor
+- The goal is to build a tweetbox
+![Tweetbox](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-11-at-10-47-06-AM.png)
