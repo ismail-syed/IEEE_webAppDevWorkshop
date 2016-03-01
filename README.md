@@ -309,5 +309,6 @@ meteor:PRIMARY> db.tweets.find()
 
 ## Part 3: User Accounts
 - In this part we will be building a user authentication system
+
 ![User Authentication](http://randomdotnext.com/content/images/2015/07/loginExp.gif)
 
