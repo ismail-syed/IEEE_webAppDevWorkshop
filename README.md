@@ -224,3 +224,70 @@ The head & body html syntax should be familiar to you all. Let's cover the blaze
 ##### Take-away
 - Dynamically insert html elements, tags, classes, components, etc by using Meteor's blaze framework
 - Easily modify what the UI render will look like without worrying about complicated front-end logic
+
+
+### Section 3: Counter and Tweet Button Javascript
+- Keeping a counter of character count in the tweetbox
+- Meteor templates offer three lifecycle callback functions: `onCreated`, `onDestroyed`, and `onRendered`
+- We can set the initial character counter to zero when the tweetBox template is rendered
+
+``` javascript
+Template.tweetBox.onRendered(function () {  
+  Session.set('numChars', 0);
+});
+```
+- We want to update the character counter when the user types content into the textbox
+- We can add an event listener for input into #tweetText element. This syntax is quite similar to that of jQuery. tweetText is the id of the DOM element.
+- 
+```javascript
+Template.tweetBox.events({  
+  'input #tweetText': function(){
+    Session.set('numChars', $('#tweetText').val().length);
+  }
+});
+```
+- Lastly, we want helper methods to push session variable changes into the HTML
+- Again, from the HTML, there are three variables we need to implement: {{charClass}}, {{charCount}}, and {{disableButton}}
+```javascript
+Template.tweetBox.helpers({  
+  charCount: function() {
+    return 140 - Session.get('numChars');
+  },
+
+  charClass: function() {
+    if (Session.get('numChars') > 140) {
+      return 'errCharCount';    //css class name
+    } else {
+      return 'charCount';       //css class name
+    }
+  },
+
+  disableButton: function() {
+    if (Session.get('numChars') <= 0 ||
+        Session.get('numChars') > 140) {
+      return 'disabled';
+    }
+  }
+});
+```
+- Notice that the changes to numChars actually reactively notify these helper methods to push new values into the DOM
+- However, if the helper method only has static values, it will not run when you update Session variables
+
+### Section 4: Add Tweets to MongoDB:
+- We need to add one more event listener inside of Template.tweetBox.events to insert data into mongoDB
+```javascript
+'click button': function() {  
+  var tweet = $('#tweetText').val();
+  $('#tweetText').val("");
+  Session.set('numChars', 0);
+  Tweets.insert({message: tweet});
+}
+```
+Before the `isClient` block, simply define the mongoDb collection:
+```javascript
+Tweets = new Meteor.Collection("tweets");  
+```
+- This Mongodb collection is accessible by both the client and the server without any additional code!
+- Now you can to try to tweet in the barebone tweetBox. This is the UI that you should see if you followed along:
+![Tweetbox](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-11-at-10-47-06-AM.png)
+
