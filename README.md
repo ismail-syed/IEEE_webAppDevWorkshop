@@ -44,6 +44,8 @@ This workshop assumes you have a general understanding of the basics concepts in
 ### Section 1.1: Installation & Setup
 - [Install Meteor](https://www.meteor.com/install)
 
+Windows users may need to add meteor to there system path:  `%USERPROFILE%\AppData\Local\.meteor;`
+
 Meteor comes with a command-line tool belt `meteor` used to create your project and run many of meteors commands. 
 
 Create a Meteor project:
