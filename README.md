@@ -343,6 +343,8 @@ Tweets = new Meteor.Collection("tweets");
 ```bash
 meteor mongo
 ```
+Note: Depending on your setup, you may have to type in `user meteor` before using `meteor mongo`
+
 - Mongo console should now show up in your terminal/cmd. 
 - type in `db.tweets.find()`
 ```bash
