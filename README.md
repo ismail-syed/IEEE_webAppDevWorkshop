@@ -274,6 +274,52 @@ Template.tweetBox.helpers({
 - Notice that the changes to numChars actually reactively notify these helper methods to push new values into the DOM
 - However, if the helper method only has static values, it will not run when you update Session variables
 
+Your myTwitterClone.js should now look something like: 
+```javascript
+if (Meteor.isClient) {
+
+  Template.tweetBox.helpers({  
+    charCount: function() {
+      return 140 - Session.get('numChars');
+    },
+
+    charClass: function() {
+      if (Session.get('numChars') > 140) {
+        return 'errCharCount';    //css class name
+      } else {
+        return 'charCount';       //css class name
+      }
+    },
+
+    disableButton: function() {
+      if (Session.get('numChars') <= 0 ||
+          Session.get('numChars') > 140) {
+        return 'disabled';
+      }
+    }
+  });
+
+  Template.tweetBox.events({  
+    'input #tweetText': function(){
+      Session.set('numChars', $('#tweetText').val().length);
+    }
+  });
+
+  Template.tweetBox.onRendered(function () {  
+    Session.set('numChars', 0);
+  });
+
+}
+
+if (Meteor.isServer) {
+  Meteor.startup(function () {
+    // code to run on server at startup
+  });
+}
+
+```
+
+
 ### Section 2.4: Add Tweets to MongoDB:
 - We need to add one more event listener inside of Template.tweetBox.events to insert data into mongoDB
 ```javascript
