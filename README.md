@@ -31,12 +31,12 @@ This workshop assumes you have a general understanding of the basics concepts in
 - In this workshop we will be building a Twitter clone using [Meteor](https://www.meteor.com/), a full-stack web application framework. 
 - We will be following an excellent tutorial  written by [Kai from randomdotnext.com](http://randomdotnext.com/) - [Meteor Tutorial - Let's build a Twitter clone](http://randomdotnext.com/meteor-tutorial-p1/)
 
-### [Part 1 - Intro to Meteor	link](#user-content-part-1:-Intro-to-Meteor)
-### [Part 2 - Client Template JS	link](#user-content)
-### [Part 3 - User Account	link](#user-content)
-### Part 4 - Security & Structure	link
-### Part 5 - Server Methods	link
-### Part 6 - Data Publish/Subscribe	link
+#### [Part 1 - Intro to Meteor	link](#part-1:-intro-to-meteor)
+#### [Part 2 - Client Template JS	link](#user-content)
+#### [Part 3 - User Account	link](#user-content)
+#### Part 4 - Security & Structure	link
+#### Part 5 - Server Methods	link
+#### Part 6 - Data Publish/Subscribe	link
 
 ## Part 1: Intro to Meteor
 
