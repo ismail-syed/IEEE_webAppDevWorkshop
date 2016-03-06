@@ -9,6 +9,7 @@ This workshop assumes you have a general understanding of the basics concepts in
   * [HTML & CSS Codecademy (~7 hours)](https://www.codecademy.com/learn/web)
   * [JavaScript (~10 hours)](https://www.codecademy.com/learn/javascript)
   * [15 minute Git tutorial](https://try.github.io/levels/1/challenges/1)
+  * [Command line basics](https://www.codecademy.com/learn/learn-the-command-line)
 
 ###### Quick Reads & Tutorials 
  * [W3 Schools: HTML](http://www.w3schools.com/html/default.asp)
