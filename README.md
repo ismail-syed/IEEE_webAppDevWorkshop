@@ -522,7 +522,7 @@ Template.userManagement.events({
 ```
 - We have put in some Blaze template code to show logged in user 
 - `{{# if currentUser}}` `{{else}}` `{{/if}}` block will show a welcome message if user is logged in, or the login/signup form if the user is not logged in
-- `currentUser` is calling a helper method that is part of Meteor user-accounts package [(doc)(http://docs.meteor.com/#/full/template_currentuser)
+- `currentUser` is calling a helper method that is part of Meteor user-accounts package (doc)(http://docs.meteor.com/#/full/template_currentuser)
 
 ```html
 <p>Hello <strong>@{{currentUser.username}}</strong>, welcome to twitterClone</p>  
@@ -599,3 +599,66 @@ meteor:PRIMARY> db.tweets.find()
 ```
 
 
+##Part 4: Security & File Structure
+In this part we will be:
+- Adding security to our application
+- Organizing the application so the codebase can scale nicely
+
+
+###Section 4.1: Remove the autopublish and insecure packages
+- `insecure` and `autpublish` are two packages that come with meteor out the box
+- They are packages designed for developer-friendliness
+- We have been able to take for granted that we can access and modify databases on the client-side without any authentication. 
+
+For example, you can type in the following command in the browser console:
+```bash
+Meteor.users.find().fetch()  
+```
+- And you will get the entire list of users and their emails!!! 
+- This is because the autopublish package allows the server to publish all the database in complete form. 
+- We do not want this. So let's remove it.
+```bash
+meteor remove autopublish  
+```
+
+- Now you should see that the same db query on the client-side will get you an empty list.
+- But we are not done! Right now, anyone can update and remove any tweets. 
+- Once again, back in the browser console:
+```bash
+Tweets.remove({_id: 'someTweetId'})  
+```
+
+- Essentially, anyone can perform the db update, insert, and remove operations from any client.
+- We can remove the insecure package to prevent this:
+```bash
+meteor remove insecure  
+```
+
+- Now, if you try to remove tweets, you get a notification:
+```bash
+remove failed: Access denied
+```
+
+###Section 4.1: Meteor Application File Structure
+- Our JavaScript code has been all in one file up to this point... This isn't scalable in real-life applications
+- Meteor offers a high level of flexibility when it comes to file structure [doc](http://docs.meteor.com/#/full/structuringyourapp). 
+- Meteor has its own file loading order that you cannot override. I won't go into too much detail about this.
+- You should understand that you do not get to specify each javascript dependency in your html as is the case with most other frameworks. - All files are loaded. So you should exercise caution when it comes to structuring your files.
+
+There are special directory names that you can define in your file structure for Meteor framework:
+
+* client (same as Meteor.isClient)
+* server (same as Meteor.isServer)
+* public (static assets)
+* private (assets only available to server)
+* tests (test code)
+
+Additionally, files inside of `/lib` are loaded before their parent directories.
+
+- The application currently does not have not assets or tests. 
+- We will simply divide the content into client/server files. The database is shared for both the server and the client. 
+- So we want to put our database in the /lib folder. See the new file structure:
+![File Structure](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-11-at-9-25-52-PM.png)
+
+- On the client-side, we will further separated the code into the stylesheets (css)/templates (html)/js. 
+- We can now start to write code in a structured fashion!
