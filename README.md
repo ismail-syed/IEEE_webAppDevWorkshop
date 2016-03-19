@@ -662,3 +662,228 @@ Additionally, files inside of `/lib` are loaded before their parent directories.
 
 - On the client-side, we will further separated the code into the stylesheets (css)/templates (html)/js. 
 - We can now start to write code in a structured fashion!
+
+##Part 5: Server Methods
+In this section, we will be learning about writing server-side javascript methods in Meteor. The goal is to enable a user to follow other users. We  will build this module:
+![Image](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-12-at-12-09-44-AM.png)
+We will see how Meteor allows you to interact with the server with minimal amount of code.
+
+###Section 5.1 Search for User on the Server
+As we talked about in the part 4, after we remove `autopublish` package, the client no longer has access to all the users. We want to be able to find users to follow. Let's start with a simple search module:
+
+/client/stylesheets/twitterClone.css
+[CSS on github](https://github.com/ruler88/twitterClone/blob/master/part4_security_and_structure/client/stylesheets/twitterClone.css)
+
+/client/templates/followUsers.html
+```html
+<form class="form-inline">  
+  <input type="text" class="form-control" id="searchUser" placeholder="Search for user">
+  <button type="submit" class="btn btn-info">Search</button>
+</form>  
+```
+
+
+/client/js/followUsers.js
+```js
+Template.followUsers.events({  
+  'submit form': function(event) {
+    var searchUser = event.target.searchUser.value;
+
+    var foundUser = Meteor.call('findUser', searchUser, function(err, res) {
+      if (res) Session.set('foundUser', res);
+    });
+    return false;
+  }
+});
+```
+p.s. notice the change in our file structure!
+
+We switched to using a form instead of using textbox/button. Using a form gives us the advantage that the `submit form` function can accept an `event` variable that contains all the values of the form. We can access the value in textbox by `event.target.searchUser.value.`
+
+Here we are using `Meteor.call('findUser', searchUser, callback)`. We have not defined the method `findUser` yet. We will be doing that on the server-side. This is how Meteor exposes server code to the client. The first variable `searchUser` would be the first parameter passed into the server method. This method also contains a callback when the query is complete.
+
+Lastly, the method is returning false because a form submit kicks off a page refresh and we want to prevent that from happening.
+
+
+/server/js/followUsers.js
+```js
+Meteor.methods({  
+  'findUser': function(username) {
+    return Meteor.users.findOne({
+      username: username
+    }, {
+      fields: { 'username': 1 }
+    });
+  }
+});
+```
+
+`findUser` method is defined and executed on the server. Notice that the js file is stored in the `/server` directory. This method contains nothing more than a mongodb call to find the username. The first argument `username` came from the client call `Meteor.call('findUser, searchUser).`
+
+I hope you are starting to appreciate the simplicity of Meteor. Methods defined in the server can be called by methods in the client directly without jumping through hoops! This is an awesome concept in full-stack js framework.
+
+###Section 5.2: Display Found User
+
+/client/templates/followUsers.html
+```js
+{{#if foundUser}}
+  <div class="found-user">
+    <button type="button" class="btn btn-default" id="follow">Follow @{{foundUser.username}}</button>
+  </div>
+{{/if}}
+```
+
+/client/js/followUsers.js
+```js
+Template.followUsers.helpers({  
+  'foundUser': function() {
+    return Session.get('foundUser');
+  }
+});
+
+Template.followUsers.events({  
+  'click #follow': function() {
+    Meteor.call('followUser', Session.get('foundUser').username);
+  }
+});
+```
+
+/server/js/followUsers.js
+```js
+Meteor.methods({  
+  'followUser': function(username) {
+    Relationships.insert({
+      follower: Meteor.user().username,
+      following: username
+    });
+  }
+});
+```
+
+We are once again calling a server-defined method directly in the client `Meteor.call('followUser', Session.get('foundUser').username)`
+
+If the user successfully finds someone that she wishes to follow, we will display a button for her to do so. On the server-side, we are creating a new database to store following/follower relationships. We do want to ensure that a user does not mistakeningly follow the same user twice. We can do this through mongodb unique check.
+
+/server/js/startup.js
+```js
+Meteor.startup(function () {  
+  Relationships._ensureIndex({follower: 1, following: 1}, {unique: 1});
+});
+```
+Meteor.startup() runs when the server first starts up. [ensureIndex](https://docs.mongodb.org/manual/reference/method/db.collection.ensureIndex/) is a mongodb operation to create an index and ensure uniqueness. The server will prevent dups in the Relationships db.
+
+###Section 5.3 Recommend People to Follow
+We want to display some random people that the user could follow inside the same UI module.
+
+/client/templates/followUsers.html
+```js
+<div class="recommend-users">  
+  <h5>Who to follow:</h5>
+  {{#each recommendedUsers}}
+    <button type="button" class="btn btn-default" id="followRec">Follow @{{this.username}}</button>
+  {{/each}}
+</div>  
+```
+
+The each for-loop here is part of Blaze/Handlebar syntax. `recommendedUsers` will be a helper method returning an array of content.
+
+/client/js/followUsers.js
+```js
+Template.followUsers.helpers({  
+  'recommendedUsers': function() {
+    return Session.get('recommendedUsers');
+  }
+});
+
+Template.followUsers.events({  
+  'click #followRec': function(event) {
+    Meteor.call('followUser', this.username);
+  }
+});
+
+Template.followUsers.onRendered(function () {  
+  Meteor.call('recommendUsers', function(err, res) {
+    Session.set('recommendedUsers', res);
+  });
+});
+```
+
+As the page renders, the client-side template will make a call to `recommendUsers` server method in order to get a list of potential candidates that the logged in user can follow.
+
+If the user clicks on any of the recommendations, the events function `'click #followRec'` will be called. You can see that we used `this` to refer to context in the current for loop iteration.
+
+Let's define the `recommendUsers` method on the server:
+
+/server/js/followUsers.js
+```js
+Meteor.methods({  
+  'recommendUsers': function() {
+    if (Meteor.user()) {
+      var currentFollowings = UserUtils.findFollowings(Meteor.user().username);
+
+      var recUsers = Meteor.users.find({
+        username: {
+          $nin: currentFollowings
+        }
+      }, {
+        fields: { 'username': 1 },
+        limit: 5
+      }).fetch();
+
+      return recUsers;
+    }
+  }
+});
+```
+
+We do not want to recommend candidates that the user is already following. We are calling the method  `UserUtils.findFollowings(Meteor.user().username)` to find the list already being followed. We will go ahead and define this method inside of the /lib directory so that it can be accessed by both the server and the client.
+
+/lib/userUtils.js
+```js
+UserUtils = function() {};    //no var in front
+
+UserUtils.findFollowings = function(username) {  
+  var currentFollowings = Relationships.find({
+    follower: username
+  }).fetch().map(function(data) {
+    return data.following;
+  });
+  currentFollowings.push(Meteor.user().username);
+
+  return currentFollowings;
+};
+```
+
+Note that `UserUtils` does not have `var` in front of its definition. All variables and functions are automatically file-scoped, meaning that you cannot access them outside of the file you defined them in (think [IIFE](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression)). However, you can create globally scoped variables by defining them without `var`. We want `UserUtils` to be globally accessible.
+
+Mongodb queries tend to be a bit verbose, but don't get tied up on those! Check out the [mongoDb](https://docs.mongodb.org/manual/applications/crud/) doc for more details. Focus on the server-client method calls and the ability to share methods between the two entities.
+
+###Section 5.4 Move Tweet Insertion to Server
+Remember how we removed the Meteor package `insecure` in part 4? We can no longer insert data into the Tweets db instance on the client-side. Let's move the data insertion to the server.
+
+/client/js/tweetBox.js
+```js
+'click button': function() {  
+  var tweet = $('#tweetText').val();
+  $('#tweetText').val("");
+  Session.set('numChars', 0);
+  Meteor.call('insertTweet', tweet);
+}
+```
+
+
+/server/js/tweetBox.js
+```js 
+Meteor.methods({  
+  insertTweet: function(tweet) {
+    if (Meteor.user()) {
+      Tweets.insert({
+        message: tweet,
+        user: Meteor.user().username
+      });
+    }
+  }
+});
+```
+
+
