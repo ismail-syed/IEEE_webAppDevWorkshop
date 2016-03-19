@@ -665,7 +665,9 @@ Additionally, files inside of `/lib` are loaded before their parent directories.
 
 ##Part 5: Server Methods
 In this section, we will be learning about writing server-side javascript methods in Meteor. The goal is to enable a user to follow other users. We  will build this module:
+
 ![Image](http://randomdotnext.com/content/images/2015/07/Screen-Shot-2015-07-12-at-12-09-44-AM.png)
+
 We will see how Meteor allows you to interact with the server with minimal amount of code.
 
 ###Section 5.1 Search for User on the Server
@@ -885,5 +887,304 @@ Meteor.methods({
   }
 });
 ```
+
+##Part 6: Data Publish/Subscribe
+In this section we will be learning about data transfer between server and client.
+
+Meteor core library comes with Distributed Data Protocol [(DPP)](https://www.meteor.com/ddp), which is a websocket protocol for doing live data updates. The protocol follows the [publish/subscribe pattern](https://en.wikipedia.org/wiki/Publish%E2%80%93subscribe_pattern).
+
+In a nutshell, the data publisher (producer) will notify data subscribers (consumers) if there is a change in the database. Instead of the client consumers constantly pulling data from the server producer, the server will push data to the clients.
+
+![](http://randomdotnext.com/content/images/2015/07/pubsub.png)
+We will using this data protocol to build our twitter feed to support live updates.
+
+###Section 6.1: Public/Subscribe Tweets
+
+Let's take a look at how you would get access to the Tweets on the client-side now that we have removed autopublish package in part 4.
+
+/server/js/publications.js
+```js
+Meteor.publish('tweets', function() {  
+  return Tweets.find();
+});
+```
+
+/client/js/tweetFeed.js
+```js
+Template.tweetFeed.onCreated(function() {  
+  this.subscribe('tweets');
+});
+```
+
+The server is publishing all the content of `Tweets` and the client is subscribing to it inside of a template.
+
+The problem with the current design is that we are going to get all the tweets, not just from the folks you are following. You can modify the publish code so that it only selects a subset of the data to publish.
+
+/server/js/publications.js
+```js
+Meteor.publish('tweets', function() {  
+  if (this.userId) {
+    var username = Meteor.users.findOne({_id: this.userId}).username;
+    var currentFollowings = UserUtils.findFollowings(username);
+
+    return Tweets.find({user: { $in: currentFollowings }});
+  }
+});
+```
+This code allows us to get tweets from only the followed users.
+
+###Section 6.2 Display Tweets
+
+Before we start displaying tweets, let's think about how we want to organize it. Twitter displays tweets in the reverse time order, such that the newest item would be on top. Let's attach a timestamp to our tweets so we can do the same thing.
+
+/server/js/tweetBox.js
+```js
+insertTweet: function(tweet) {  
+  if (Meteor.user()) {
+    Tweets.insert({
+      message: tweet,
+      user: Meteor.user().username,
+      timestamp: new Date()
+    });
+  }
+}
+```
+And we can change the tweet order directly in the subscription query, and we want to limit the size of our feed to a reasonable count of 10:
+
+/client/stylesheets/twitterClone.css
+[CSS on github](https://github.com/ruler88/twitterClone/blob/master/part6_publishSubscribe/client/stylesheets/twitterClone.css)
+
+/client/js/tweetFeed.js
+```js
+Template.tweetFeed.helpers({  
+  'tweetMessage': function() {
+    return Tweets.find({}, { 
+        sort: {timestamp: -1}, 
+        limit: 10
+    });
+  }
+});
+```
+
+/client/templates/tweetFeed.html
+```html
+<template name="tweetFeed">  
+  <div class="tweetfeed-container">
+    <div class="panel panel-default tweetfeed">
+      <div class="panel-body">
+        <!-- Text box for tweet content -->
+        {{#each tweetMessage}}
+          <div class="panel panel-info">
+            <div class="panel-heading">
+              <h3 class="panel-title">@{{this.user}} 
+                <span class="glyphicon glyphicon-triangle-right" aria-hidden="true"></span>
+                 {{this.timestamp}}
+               </h3>
+            </div>
+            <div class="panel-body">
+              {{this.message}}
+            </div>
+          </div>
+        {{/each}}
+      </div>
+    </div>
+  </div>
+</template>  
+```
+
+You should now be able to see real time updates coming from tweet messages. The following is a demo as I logged in as two users following each other: 
+
+![Real time](http://randomdotnext.com/content/images/2015/07/tweetfeed.gif)
+
+
+###Section 6.2: ADVANCED TOPIC: Reactive Join Publish
+
+Note: Feel free to skip this section if you feel like it. This is intended for more advanced discussion of the pub/sub pattern in Meteor.
+
+While this might not be immediately obvious to you, if you follow a new user, your feed will not immediately update with tweets from the new user. This is happening because the server publish method in Meteor only publishes the cursor. Any changes to the dependency of the cursor will not be reactively pushed to the client (details).
+
+What we need to do here is to perform a reactive join when we publish the data. Fortunately there is a Meteor package that can help us with this.
+
+```bash
+meteor add reywood:publish-composite  
+```
+
+/server/js/publications.js
+```js
+Meteor.publishComposite('tweets', function(username) {  
+  return {
+    find: function() {
+      // Find the current user's following users
+      return Relationships.find({ follower: username });
+    },
+    children: [{
+      find: function(relationship) {
+        // Find tweets from followed users
+        return Tweets.find({user: relationship.following});
+      }
+    }]
+  }
+});
+
+Meteor.publish('ownTweets', function(username) {  
+  return Tweets.find({user: username});
+});
+```
+
+Let's look at `Meteor.publishComposite()` method first. The `find: function()` function watches for changes in the `Relationships` database. This method returns a reactive cursor for a list of Relationships, which is passed to each of the child's `find()` function. The child will then query for Tweets associated with each user passed into it. For details of the publishComposite, please take a look at the package [doc](https://atmospherejs.com/reywood/publish-composite).
+
+Lastly, we want to see user's own tweets. This can be done easily with `Meteor.publish('ownTweets', function(username))`. Remember that you need to subscribe to other publishers in the client:
+
+/client/js/tweetFeed.js
+```js
+Template.tweetFeed.onCreated(function() {  
+  if (Meteor.user()) {
+    this.subscribe('tweets', Meteor.user().username);
+    this.subscribe('ownTweets', Meteor.user().username);
+  }
+});
+```
+We now have a reactive join that updates your twitter feed as you follow new users: 
+
+[](http://randomdotnext.com/content/images/2015/07/reactiveJoin.gif)
+
+(Word of caution, reactive joins are pretty expensive in terms of db queries. A production version might consider doing [data normalization](https://en.wikipedia.org/wiki/Database_normalization))
+
+###Section 6.3: Use Pub/Sub for Follow Recommendations
+
+Now that we know how to do publication and subscription. Let's improve our follow recommendations. The existing module does not respond to user interaction. When you click on someone to follow, : 
+![](http://randomdotnext.com/content/images/2015/07/ezgif-com-add-text.gif)
+
+I'll demonstrate how you can use a reactive client-side data join to solve this problem. We can do this on the client-side instead of server because none of the data involved need to be hidden from the client. All we need is a list of usernames, and the individuals that the current user is following.
+
+/server/js/publications.js
+```js
+// List of all usernames
+Meteor.publish('users', function(username) {  
+  return Meteor.users.find({}, {
+    fields: { 'username': 1 },
+    limit: 100
+  });
+});
+
+// List of usernames the current user is following
+Meteor.publish('followings', function(username) {  
+  return Relationships.find({ follower: username });
+});
+```
+
+Now that the client has the two databases it needs. We will need to find a disjoint set. We can directly copy the server code to the client:
+
+/client/js/followUsers.js
+```js
+Template.followUsers.helpers({  
+  'recommendedUsers': function() {
+    if (Meteor.user()) {
+      var currentFollowings = UserUtils.findFollowings(Meteor.user().username);
+
+      var recUsers = Meteor.users.find({
+        username: {
+          $nin: currentFollowings
+        }
+      }, {
+        fields: { 'username': 1 },
+        limit: 5
+      }).fetch();
+
+      return recUsers;
+    }
+  }
+});
+
+Template.followUsers.onCreated(function() {  
+  if (Meteor.user()) {
+    this.subscribe('users', Meteor.user().username)
+    this.subscribe('followings', Meteor.user().username);
+  }
+});
+```
+
+This is the beauty of Meteor's full-stack framework. We did not need to change a single line of code for this server-side logic to work on the client.
+
+[](http://randomdotnext.com/content/images/2015/07/ezgif-com-add-text--1-.gif)
+
+###Section 6.4: Use Pub/Sub for User Profile
+
+Let's finish up the last modification we want to do with pub/sub. Our user profile does not show any cool information other than the username. Let's change this. Twitter shows the number of tweets, followers, and followings. We can implement this very easily.
+
+We need to publish one more set of information. To get the follower counter:
+
+/server/js/publications.js
+```js
+Meteor.publish('followers', function(username) {  
+  return Relationships.find({ following: username });
+});
+```
+
+On the client template, we will go ahead and count the number of followers, followings, and tweets by using mongoDb's `count()` method:
+
+/client/js/userManagement.js
+```js
+Template.userManagement.helpers({  
+  'tweets': function() {
+    if (Meteor.user()) {
+      return Tweets.find({ user: Meteor.user().username }).count();
+    }
+  },
+
+  'following': function() {
+    if (Meteor.user()) {
+      return Relationships.find({ follower: Meteor.user().username }).count();
+    }
+  },
+
+  'followers': function() {
+    if (Meteor.user()) {
+      return Relationships.find({ following: Meteor.user().username }).count();
+    }
+  }
+});
+
+Template.followUsers.onCreated( function() {  
+  if (Meteor.user()) {
+    this.subscribe('followings', Meteor.user().username);
+    this.subscribe('followers', Meteor.user().username);
+    this.subscribe('tweets', Meteor.user().username);
+  }
+});
+```
+
+/client/templates/userManagement.html
+```js
+{{# if currentUser}}
+<!-- Message for logged in user -->  
+<p>Hello <strong>@{{currentUser.username}}</strong>, welcome to twitterClone</p>  
+<button type="button" class="btn btn-info fullbutton" id="logout">Log out</button>
+
+<table class="table">  
+  <tr>
+    <td class="tableHeader">Tweets</td>
+    <td class="tableHeader">Following</td>
+    <td class="tableHeader">Followers</td>
+  </tr>
+  <tr>
+    <td class="tableContent">{{tweets}}</td>
+    <td class="tableContent">{{following}}</td>
+    <td class="tableContent">{{followers}}</td>
+  </tr>
+</table>
+
+{{else}}
+```
+
+Notice the Tweets count and Following count increases as I interact with the application, in real time! 
+
+![](http://randomdotnext.com/content/images/2015/07/1e1yc8K3Xi.gif)
+
+###Conclusion
+
+We have only touched the tip of the iceberg. Meteor offers a whole lot of features to make your life as a developer easier. Meteor also recently raised [substantial funding](http://techcrunch.com/2015/05/19/meteor-raises-20m-to-build-the-one-javascript-stack-to-rule-them-all/) to further develop the framework. I'm sure the framework will continue to evolve as the community continue to develop on it. So, keep learning, keep hacking.
+
+
 
 
