@@ -896,6 +896,7 @@ Meteor core library comes with Distributed Data Protocol [(DPP)](https://www.met
 In a nutshell, the data publisher (producer) will notify data subscribers (consumers) if there is a change in the database. Instead of the client consumers constantly pulling data from the server producer, the server will push data to the clients.
 
 ![](http://randomdotnext.com/content/images/2015/07/pubsub.png)
+
 We will using this data protocol to build our twitter feed to support live updates.
 
 ###Section 6.1: Public/Subscribe Tweets
